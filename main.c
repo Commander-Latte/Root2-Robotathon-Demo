@@ -102,7 +102,7 @@ Begin: main
 */
 /**************************************************************************/
 
-
+/*
 int main()
 {
 	// Define menu string
@@ -136,7 +136,7 @@ Choose an option:\n\r1 - Motor Demo\n\r2 - Servo Demo\n\r\
 	
 	return 0;
 }
-
+*/
 /**************************************************************************/
 /*
 End: main
@@ -638,14 +638,19 @@ End: Useful functions
     begin here.
 */
 /**************************************************************************/
-/*int main(void)
+int main(void)
 {
   // Configure cpu and mandatory peripherals
-  systemInit();
+  root2Init();
 
   uint32_t currentSecond, lastSecond;
   currentSecond = lastSecond = 0;
-
+  
+	int enc0_val, enc1_val;
+	int motor0 = 0;
+	int motor1 = 1;
+	int duties[] = {50, 50};
+	
   while (1)
   {
     // Toggle LED once per second ... rollover = 136 years :)
@@ -662,7 +667,30 @@ End: Useful functions
         gpioSetValue (CFG_LED_PORT, CFG_LED_PIN, CFG_LED_OFF); 
       }
     }
+		
+		for(int x = 51; x < 76; x++) {
+			duties[motor0] = x;
+			duties[motor1] = x;
+			setMotorDuty(motor0, duties[motor0]);
+			setMotorDuty(motor1, duties[motor1]);
+		}
+		
+		enc0_val = getEncoderValue(ENCODER_0);
+		enc1_val = getEncoderValue(ENCODER_1);
+		
+		while (enc0_val > enc1_val) {
+			duties[motor1] = duties[motor1]++;
+			setMotorDuty(motor1, duties[motor1]);
+		}
+		
+		while (enc1_val > enc0_val) {
+			duties[motor0] = duties[motor0]++;
+			setMotorDuty(motor0, duties[motor0]);
+		}
+		
+		while(1);
+		
   }
 
   return 0;
-}*/
+}
